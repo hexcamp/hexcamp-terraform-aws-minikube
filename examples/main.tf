@@ -1,12 +1,17 @@
 module "minikube" {
-  source = "scholzj/minikube/aws"
+  #source = "scholzj/minikube/aws"
+  #source = "github.com/scholzj/terraform-aws-minikube"
+  #source = "github.com/praveen18k/terraform-aws-minikube-1?ref=patch-1"
+  #source = "github.com/praveen18k/terraform-aws-minikube?ref=184e32c8347b6fa437671436b63c37193bf7b46e"
+  #source = "git::https://github.com/praveen18k/terraform-aws-minikube.git?ref=184e32c8347b6fa437671436b63c37193bf7b46e"
+  source = "./.."
 
-  aws_region          = "eu-central-1"
+  aws_region          = "us-west-2"
   cluster_name        = "my-minikube"
   aws_instance_type   = "t2.medium"
   ssh_public_key      = "~/.ssh/id_rsa.pub"
-  aws_subnet_id       = "subnet-8a3517f8"
-  hosted_zone         = "my-domain.com"
+  aws_subnet_id       = "subnet-0a02e435e762c1bec"
+  hosted_zone         = "localnet.farm"
   hosted_zone_private = false
   ami_image_id        = ""
 
