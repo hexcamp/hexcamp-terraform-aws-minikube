@@ -55,6 +55,13 @@ EOF
 # Apply sysctl params without reboot
 sysctl --system
 
+# https://serverfault.com/questions/1161816/mirrorlist-centos-org-no-longer-resolve
+sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo
+sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/CentOS-*.repo
+sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/CentOS-*.repo
+yum update -y
+
+
 yum install -y yum-utils curl gettext device-mapper-persistent-data lvm2
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum install -y containerd.io

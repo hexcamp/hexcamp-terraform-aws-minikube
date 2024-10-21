@@ -13,7 +13,7 @@ module "minikube" {
   aws_subnet_id       = "subnet-0a02e435e762c1bec"
   hosted_zone         = "localnet.farm"
   hosted_zone_private = false
-  ami_image_id        = ""
+  ami_image_id        = "ami-08c191625cfb7ee61"
 
   tags = {
     Application = "Minikube"
