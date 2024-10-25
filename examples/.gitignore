@@ -1,2 +1,3 @@
 .terraform*
 kubeconfig2
+kubeconfig_ip

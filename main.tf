@@ -46,28 +46,28 @@ resource "aws_security_group" "minikube" {
     from_port   = 53
     to_port     = 53
     protocol    = "udp"
-    cidr_blocks = [var.http_access_cidr]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    cidr_blocks = [var.api_access_cidr]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 30080
     to_port     = 30080
     protocol    = "tcp"
-    cidr_blocks = [var.http_access_cidr]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 30443
     to_port     = 30443
     protocol    = "tcp"
-    cidr_blocks = [var.http_access_cidr]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -204,7 +204,7 @@ resource "aws_instance" "minikube" {
 
   root_block_device {
     volume_type = "gp2"
-    volume_size = "50"
+    volume_size = "8"
     delete_on_termination = true
   }
 
@@ -237,5 +237,6 @@ resource "aws_route53_record" "minikube" {
   type = "A"
   records = [aws_eip.minikube.public_ip]
   ttl = 300
+  allow_overwrite = true
 }
 
