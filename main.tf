@@ -43,10 +43,31 @@ resource "aws_security_group" "minikube" {
   }
 
   ingress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [var.http_access_cidr]
+  }
+
+  ingress {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
     cidr_blocks = [var.api_access_cidr]
+  }
+
+  ingress {
+    from_port   = 30080
+    to_port     = 30080
+    protocol    = "tcp"
+    cidr_blocks = [var.http_access_cidr]
+  }
+
+  ingress {
+    from_port   = 30443
+    to_port     = 30443
+    protocol    = "tcp"
+    cidr_blocks = [var.http_access_cidr]
   }
 
   egress {

@@ -7,8 +7,8 @@ module "minikube" {
   source = "./.."
 
   aws_region          = "us-west-2"
-  cluster_name        = "my-minikube"
-  aws_instance_type   = "t2.medium"
+  cluster_name        = "minikube1"
+  aws_instance_type   = "t3a.medium"
   ssh_public_key      = "~/.ssh/id_rsa.pub"
   aws_subnet_id       = "subnet-0a02e435e762c1bec"
   hosted_zone         = "localnet.farm"
