@@ -204,7 +204,7 @@ resource "aws_instance" "minikube" {
 
   root_block_device {
     volume_type = "gp2"
-    volume_size = "8"
+    volume_size = "10"
     delete_on_termination = true
   }
 
