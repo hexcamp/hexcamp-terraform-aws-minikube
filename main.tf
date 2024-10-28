@@ -204,7 +204,7 @@ resource "aws_instance" "minikube" {
 
   root_block_device {
     volume_type = "gp2"
-    volume_size = "10"
+    volume_size = "20"
     delete_on_termination = true
   }
 
@@ -214,6 +214,19 @@ resource "aws_instance" "minikube" {
       user_data,
       associate_public_ip_address,
     ]
+  }
+
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = 0.045
+      instance_interruption_behavior = "stop"
+      spot_instance_type = "persistent"
+    }
+  }
+
+  credit_specification {
+    cpu_credits = "standard"
   }
 }
 
