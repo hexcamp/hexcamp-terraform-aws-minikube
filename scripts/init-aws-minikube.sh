@@ -23,74 +23,114 @@ FULL_HOSTNAME="$(curl -s http://169.254.169.254/latest/meta-data/hostname)"
 # Make DNS lowercase
 DNS_NAME=$(echo "$DNS_NAME" | tr 'A-Z' 'a-z')
 
+# Ubuntu instructions
+# https://www.linuxtechi.com/how-to-install-minikube-on-ubuntu/
+
+apt update
+apt upgrade -y
+apt install -y curl wget apt-transport-https ca-certificates
+
+cd /tmp
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+install minikube-linux-amd64 /usr/local/bin/minikube
+minikube version
+
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x kubectl
+mv kubectl /usr/local/bin/
+#kubectl version -o yaml
+
+# Docker
+
+# https://www.linuxtechi.com/install-docker-on-ubuntu-24-04/
+
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update
+apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+usermod -aG docker ubuntu
+newgrp docker
+docker --version
+
+systemctl status docker
+
+
 ########################################
 ########################################
 # Disable SELinux
 ########################################
 ########################################
-setenforce 0
-sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/sysconfig/selinux
-sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+#setenforce 0
+#sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/sysconfig/selinux
+#sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
 
 ########################################
 ########################################
 # Install containerd
 ########################################
 ########################################
-cat <<EOF | tee /etc/modules-load.d/containerd.conf
-overlay
-br_netfilter
-EOF
+#cat <<EOF | tee /etc/modules-load.d/containerd.conf
+#overlay
+#br_netfilter
+#EOF
 
-modprobe overlay
-modprobe br_netfilter
+#modprobe overlay
+#modprobe br_netfilter
 
 # Setup required sysctl params, these persist across reboots.
-cat <<EOF | tee /etc/sysctl.d/99-kubernetes-cri.conf
-net.bridge.bridge-nf-call-iptables  = 1
-net.ipv4.ip_forward                 = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-EOF
+#cat <<EOF | tee /etc/sysctl.d/99-kubernetes-cri.conf
+#net.bridge.bridge-nf-call-iptables  = 1
+#net.ipv4.ip_forward                 = 1
+#net.bridge.bridge-nf-call-ip6tables = 1
+#EOF
 
 # Apply sysctl params without reboot
-sysctl --system
+#sysctl --system
 
 # https://serverfault.com/questions/1161816/mirrorlist-centos-org-no-longer-resolve
-sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo
-sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/CentOS-*.repo
-sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/CentOS-*.repo
-yum update -y
+#sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo
+#sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/CentOS-*.repo
+#sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/CentOS-*.repo
+#yum update -y
 
 
-yum install -y yum-utils curl gettext device-mapper-persistent-data lvm2
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install -y containerd.io
-mkdir -p /etc/containerd
-containerd config default > /etc/containerd/config.toml
-sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-systemctl restart containerd
-systemctl enable containerd
+#yum install -y yum-utils curl gettext device-mapper-persistent-data lvm2
+#yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+#sudo yum install -y containerd.io
+#mkdir -p /etc/containerd
+#containerd config default > /etc/containerd/config.toml
+#sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+#systemctl restart containerd
+#systemctl enable containerd
 
 ########################################
 ########################################
 # Install Kubernetes components
 ########################################
 ########################################
-sudo cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
-[kubernetes]
-name=Kubernetes
-baseurl=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/
-enabled=1
-gpgcheck=1
-gpgkey=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/repodata/repomd.xml.key
-exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
-EOF
+#sudo cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+#[kubernetes]
+#name=Kubernetes
+#baseurl=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/
+#enabled=1
+#gpgcheck=1
+#gpgkey=https://pkgs.k8s.io/core:/stable:/v1.30/rpm/repodata/repomd.xml.key
+#exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+#EOF
 
-yum install -y kubectl kubelet-$KUBERNETES_VERSION kubeadm-$KUBERNETES_VERSION kubernetes-cni --disableexcludes=kubernetes
+#yum install -y kubectl kubelet-$KUBERNETES_VERSION kubeadm-$KUBERNETES_VERSION kubernetes-cni --disableexcludes=kubernetes
 
 # Start services
-systemctl enable kubelet
-systemctl start kubelet
+#systemctl enable kubelet
+#systemctl start kubelet
+
+exit 0
 
 ########################################
 ########################################
