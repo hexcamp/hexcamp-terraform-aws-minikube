@@ -17,8 +17,9 @@ export KUBERNETES_VERSION="${kubernetes_version}"
 set -o nounset
 
 # We needed to match the hostname expected by kubeadm an the hostname used by kubelet
-LOCAL_IP_ADDRESS=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
-FULL_HOSTNAME="$(curl -s http://169.254.169.254/latest/meta-data/hostname)"
+TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+LOCAL_IP_ADDRESS=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)
+FULL_HOSTNAME=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/hostname)
 
 # Make DNS lowercase
 DNS_NAME=$(echo "$DNS_NAME" | tr 'A-Z' 'a-z')
@@ -26,9 +27,48 @@ DNS_NAME=$(echo "$DNS_NAME" | tr 'A-Z' 'a-z')
 # Ubuntu instructions
 # https://www.linuxtechi.com/how-to-install-minikube-on-ubuntu/
 
-apt update
-apt upgrade -y
-apt install -y curl wget apt-transport-https ca-certificates
+apt-get update
+apt-get upgrade -y
+apt-get install -y curl wget apt-transport-https ca-certificates \
+	docker.io
+
+# https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fdebian+package
+
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+sudo dpkg -i minikube_latest_amd64.deb
+
+adduser ubuntu docker
+
+# https://joepreludian.medium.com/how-to-start-up-minikube-automatically-via-system-d-2cad99fd79bf
+
+cat <<EOF | tee /etc/systemd/system/minikube.service
+[Unit]
+Description=Kickoff Minikube Cluster
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/minikube start
+RemainAfterExit=true
+ExecStop=/usr/bin/minikube stop
+StandardOutput=journal
+User=ubuntu
+Group=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable minikube
+systemctl start minikube
+
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x kubectl
+mv kubectl /usr/local/bin/
+
+
+exit 0
 
 cd /tmp
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
