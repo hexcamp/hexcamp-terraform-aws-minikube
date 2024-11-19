@@ -21,6 +21,10 @@ TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metad
 LOCAL_IP_ADDRESS=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)
 FULL_HOSTNAME=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/hostname)
 
+echo TOKEN: $TOKEN
+echo LOCAL_IP_ADDRESS $LOCAL_IP_ADDRESS
+echo FULL_HOSTNAME: $FULL_HOSTNAME
+
 # Make DNS lowercase
 DNS_NAME=$(echo "$DNS_NAME" | tr 'A-Z' 'a-z')
 
@@ -29,77 +33,77 @@ DNS_NAME=$(echo "$DNS_NAME" | tr 'A-Z' 'a-z')
 
 apt-get update
 apt-get upgrade -y
-apt-get install -y curl wget apt-transport-https ca-certificates \
-	docker.io
+apt-get install -y curl wget apt-transport-https ca-certificates 
+#apt-get install -y docker.io
 
 # https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fdebian+package
 
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
-sudo dpkg -i minikube_latest_amd64.deb
+#curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+#sudo dpkg -i minikube_latest_amd64.deb
 
-adduser ubuntu docker
+#adduser ubuntu docker
 
 # https://joepreludian.medium.com/how-to-start-up-minikube-automatically-via-system-d-2cad99fd79bf
 
-cat <<EOF | tee /etc/systemd/system/minikube.service
-[Unit]
-Description=Kickoff Minikube Cluster
-After=docker.service
+#cat <<EOF | tee /etc/systemd/system/minikube.service
+#[Unit]
+#Description=Kickoff Minikube Cluster
+#After=docker.service
+#
+#[Service]
+#Type=oneshot
+#ExecStart=/usr/bin/minikube start
+#RemainAfterExit=true
+#ExecStop=/usr/bin/minikube stop
+#StandardOutput=journal
+#User=ubuntu
+#Group=ubuntu
+#
+#[Install]
+#WantedBy=multi-user.target
+#EOF
+#
+#systemctl daemon-reload
+#systemctl enable minikube
+#systemctl start minikube
 
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/minikube start
-RemainAfterExit=true
-ExecStop=/usr/bin/minikube stop
-StandardOutput=journal
-User=ubuntu
-Group=ubuntu
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-systemctl enable minikube
-systemctl start minikube
-
-curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-chmod +x kubectl
-mv kubectl /usr/local/bin/
+#curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+#chmod +x kubectl
+#mv kubectl /usr/local/bin/
 
 
-exit 0
+#exit 0
 
-cd /tmp
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-install minikube-linux-amd64 /usr/local/bin/minikube
-minikube version
-
-curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-chmod +x kubectl
-mv kubectl /usr/local/bin/
-#kubectl version -o yaml
+#cd /tmp
+#curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+#install minikube-linux-amd64 /usr/local/bin/minikube
+#minikube version
+#
+#curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+#chmod +x kubectl
+#mv kubectl /usr/local/bin/
+##kubectl version -o yaml
 
 # Docker
 
 # https://www.linuxtechi.com/install-docker-on-ubuntu-24-04/
 
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt update
-apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-
-usermod -aG docker ubuntu
-newgrp docker
-docker --version
-
-systemctl status docker
-
+#install -m 0755 -d /etc/apt/keyrings
+#curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+#chmod a+r /etc/apt/keyrings/docker.asc
+#echo \
+#  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+#  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+#  tee /etc/apt/sources.list.d/docker.list > /dev/null
+#apt update
+#apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+#
+#usermod -aG docker ubuntu
+#newgrp docker
+#docker --version
+#
+#systemctl status docker
+#
 
 ########################################
 ########################################
@@ -110,28 +114,36 @@ systemctl status docker
 #sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/sysconfig/selinux
 #sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
 
+# Ubuntu: Disable AppArmor - necessary?
+
+systemctl disable apparmor
+
+
 ########################################
 ########################################
 # Install containerd
 ########################################
 ########################################
-#cat <<EOF | tee /etc/modules-load.d/containerd.conf
-#overlay
-#br_netfilter
-#EOF
 
-#modprobe overlay
-#modprobe br_netfilter
+apt-get install containerd -y
+
+cat <<EOF | tee /etc/modules-load.d/containerd.conf
+overlay
+br_netfilter
+EOF
+
+modprobe overlay
+modprobe br_netfilter
 
 # Setup required sysctl params, these persist across reboots.
-#cat <<EOF | tee /etc/sysctl.d/99-kubernetes-cri.conf
-#net.bridge.bridge-nf-call-iptables  = 1
-#net.ipv4.ip_forward                 = 1
-#net.bridge.bridge-nf-call-ip6tables = 1
-#EOF
+cat <<EOF | tee /etc/sysctl.d/99-kubernetes-cri.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.ipv4.ip_forward                 = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
 
 # Apply sysctl params without reboot
-#sysctl --system
+sysctl --system
 
 # https://serverfault.com/questions/1161816/mirrorlist-centos-org-no-longer-resolve
 #sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/CentOS-*.repo
@@ -143,11 +155,12 @@ systemctl status docker
 #yum install -y yum-utils curl gettext device-mapper-persistent-data lvm2
 #yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 #sudo yum install -y containerd.io
-#mkdir -p /etc/containerd
-#containerd config default > /etc/containerd/config.toml
-#sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
-#systemctl restart containerd
-#systemctl enable containerd
+
+mkdir -p /etc/containerd
+containerd config default > /etc/containerd/config.toml
+sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+systemctl restart containerd
+systemctl enable containerd
 
 ########################################
 ########################################
@@ -166,11 +179,20 @@ systemctl status docker
 
 #yum install -y kubectl kubelet-$KUBERNETES_VERSION kubeadm-$KUBERNETES_VERSION kubernetes-cni --disableexcludes=kubernetes
 
-# Start services
-#systemctl enable kubelet
-#systemctl start kubelet
+# https://kubernetes.io/blog/2023/08/15/pkgs-k8s-io-introduction/
 
-exit 0
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | \
+	tee /etc/apt/sources.list.d/kubernetes.list
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+apt-get update
+apt-get install kubectl kubelet kubeadm kubernetes-cni -y
+
+
+# Start services
+systemctl enable kubelet
+systemctl start kubelet
 
 ########################################
 ########################################
@@ -243,6 +265,7 @@ kubeadm init --config /tmp/kubeadm.yaml
 # Use the local kubectl config for further kubectl operations
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
+
 # Install calico
 kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-operator.yaml
 kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-cr.yaml
@@ -278,16 +301,16 @@ kubectl label nodes --all node.kubernetes.io/exclude-from-external-load-balancer
 kubectl create clusterrolebinding admin-cluster-binding --clusterrole=cluster-admin --user=admin
 
 # Prepare the kubectl config file for download to client (IP address)
-export KUBECONFIG_OUTPUT=/home/centos/kubeconfig_ip
+export KUBECONFIG_OUTPUT=/home/ubuntu/kubeconfig_ip
 kubeadm kubeconfig user --client-name admin --config /tmp/kubeadm.yaml > $KUBECONFIG_OUTPUT
-chown centos:centos $KUBECONFIG_OUTPUT
+chown ubuntu:ubuntu $KUBECONFIG_OUTPUT
 chmod 0600 $KUBECONFIG_OUTPUT
 
-cp /home/centos/kubeconfig_ip /home/centos/kubeconfig
-sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$IP_ADDRESS:6443/g" /home/centos/kubeconfig_ip
-sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$DNS_NAME:6443/g" /home/centos/kubeconfig
-chown centos:centos /home/centos/kubeconfig
-chmod 0600 /home/centos/kubeconfig
+cp /home/ubuntu/kubeconfig_ip /home/ubuntu/kubeconfig
+sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$IP_ADDRESS:6443/g" /home/ubuntu/kubeconfig_ip
+sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$DNS_NAME:6443/g" /home/ubuntu/kubeconfig
+chown ubuntu:ubuntu /home/ubuntu/kubeconfig
+chmod 0600 /home/ubuntu/kubeconfig
 
 ########################################
 ########################################
@@ -300,3 +323,5 @@ do
   kubectl apply -f /tmp/addon.yaml
   rm /tmp/addon.yaml
 done
+
+echo Done.
