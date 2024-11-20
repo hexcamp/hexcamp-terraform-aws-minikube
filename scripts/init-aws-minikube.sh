@@ -271,7 +271,7 @@ kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-miniku
 kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-cr.yaml
 
 # Instal AWS Cloud Provider
-kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/aws-cloud-provider/aws-cloud-provider.yaml
+kubectl create -f https://raw.githubusercontent.com/hexcamp/hexcamp-terraform-aws-minikube/refs/heads/ubuntu/aws-cloud-provider/aws-cloud-provider.yaml
 
 # Wait for the AWS Cloud Provider to be running
 while [[ $(kubectl get pod -l k8s-app=aws-cloud-controller-manager -n kube-system -o name | wc -c) -eq 0 ]]; do

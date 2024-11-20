@@ -155,7 +155,7 @@ spec:
       serviceAccountName: cloud-controller-manager
       containers:
         - name: aws-cloud-controller-manager
-          image: registry.k8s.io/provider-aws/cloud-controller-manager:v1.30.0
+          image: registry.k8s.io/provider-aws/cloud-controller-manager:v1.31.1
           args:
             - --v=2
             - --cloud-provider=aws
@@ -163,7 +163,4 @@ spec:
             - --use-service-account-credentials=true
             # Set --configure-cloud-routes=true if required by your CNI
             - --configure-cloud-routes=false
-          resources:
-            requests:
-              cpu: 200m
       hostNetwork: true
