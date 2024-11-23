@@ -132,7 +132,8 @@ data "cloudinit_config" "minikube_cloud_init" {
   part {
     filename = "init-aws-minikube.sh"
     content_type = "text/x-shellscript"
-    content = templatefile("${path.module}/scripts/init-aws-minikube.sh", { kubeadm_token = module.kubeadm-token.token, dns_name = "${var.cluster_name}.${var.hosted_zone}", ip_address = aws_eip.minikube.public_ip, cluster_name = var.cluster_name, kubernetes_version = var.kubernetes_version, addons = join(" ", var.addons) } )
+    #content = templatefile("${path.module}/scripts/init-aws-minikube.sh", { kubeadm_token = module.kubeadm-token.token, dns_name = "${var.cluster_name}.${var.hosted_zone}", ip_address = aws_eip.minikube.public_ip, cluster_name = var.cluster_name, kubernetes_version = var.kubernetes_version, addons = join(" ", var.addons) } )
+    content = templatefile("${path.module}/scripts/init-aws-minikube.sh", { kubeadm_token = module.kubeadm-token.token, dns_name = "${var.cluster_name}.${var.hosted_zone}", cluster_name = var.cluster_name, kubernetes_version = var.kubernetes_version, addons = join(" ", var.addons) } )
   }
 }
 
@@ -169,10 +170,10 @@ data "aws_ami" "amazonlinux" {
   }
 }
 
-resource "aws_eip" "minikube" {
-  #vpc = true
-  domain = "vpc"
-}
+#resource "aws_eip" "minikube" {
+#  #vpc = true
+#  domain = "vpc"
+#}
 
 resource "aws_instance" "minikube" {
   # Instance type - any of the c4 should do for now
@@ -184,7 +185,7 @@ resource "aws_instance" "minikube" {
 
   subnet_id = var.aws_subnet_id
 
-  associate_public_ip_address = false
+  associate_public_ip_address = true
 
   vpc_security_group_ids = [
     aws_security_group.minikube.id,
@@ -230,10 +231,10 @@ resource "aws_instance" "minikube" {
   }
 }
 
-resource "aws_eip_association" "minikube_assoc" {
-  instance_id = aws_instance.minikube.id
-  allocation_id = aws_eip.minikube.id
-}
+#resource "aws_eip_association" "minikube_assoc" {
+#  instance_id = aws_instance.minikube.id
+#  allocation_id = aws_eip.minikube.id
+#}
 
 #####
 # DNS record
@@ -248,7 +249,8 @@ resource "aws_route53_record" "minikube" {
   zone_id = data.aws_route53_zone.dns_zone.zone_id
   name = "${var.cluster_name}.${var.hosted_zone}"
   type = "A"
-  records = [aws_eip.minikube.public_ip]
+  #records = [aws_eip.minikube.public_ip]
+  records = [aws_instance.minikube.public_ip]
   ttl = 300
   allow_overwrite = true
 }

@@ -8,7 +8,6 @@ set -o pipefail
 
 export KUBEADM_TOKEN=${kubeadm_token}
 export DNS_NAME=${dns_name}
-export IP_ADDRESS=${ip_address}
 export CLUSTER_NAME=${cluster_name}
 export ADDONS="${addons}"
 export KUBERNETES_VERSION="${kubernetes_version}"
@@ -19,10 +18,12 @@ set -o nounset
 # We needed to match the hostname expected by kubeadm an the hostname used by kubelet
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
 LOCAL_IP_ADDRESS=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)
+PUBLIC_IP_ADDRESS=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/public-ipv4)
 FULL_HOSTNAME=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/hostname)
 
 echo TOKEN: $TOKEN
 echo LOCAL_IP_ADDRESS $LOCAL_IP_ADDRESS
+echo PUBLIC_IP_ADDRESS $PUBLIC_IP_ADDRESS
 echo FULL_HOSTNAME: $FULL_HOSTNAME
 
 # Make DNS lowercase
@@ -30,6 +31,8 @@ DNS_NAME=$(echo "$DNS_NAME" | tr 'A-Z' 'a-z')
 
 # Ubuntu instructions
 # https://www.linuxtechi.com/how-to-install-minikube-on-ubuntu/
+
+apt-get remove unattended-upgrades -y
 
 apt-get update
 apt-get upgrade -y
@@ -246,7 +249,7 @@ kind: ClusterConfiguration
 apiServer:
   certSANs:
     - $DNS_NAME
-    - $IP_ADDRESS
+    - $PUBLIC_IP_ADDRESS
     - $LOCAL_IP_ADDRESS
     - $FULL_HOSTNAME
   extraArgs:
@@ -322,7 +325,7 @@ chown ubuntu:ubuntu $KUBECONFIG_OUTPUT
 chmod 0600 $KUBECONFIG_OUTPUT
 
 cp /home/ubuntu/kubeconfig_ip /home/ubuntu/kubeconfig
-sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$IP_ADDRESS:6443/g" /home/ubuntu/kubeconfig_ip
+sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$PUBLIC_IP_ADDRESS:6443/g" /home/ubuntu/kubeconfig_ip
 sed -i "s/server: https:\/\/.*:6443/server: https:\/\/$DNS_NAME:6443/g" /home/ubuntu/kubeconfig
 chown ubuntu:ubuntu /home/ubuntu/kubeconfig
 chmod 0600 /home/ubuntu/kubeconfig
