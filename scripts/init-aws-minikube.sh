@@ -116,8 +116,12 @@ apt-get install -y curl wget apt-transport-https ca-certificates
 
 # Ubuntu: Disable AppArmor - necessary?
 
-systemctl disable apparmor
+systemctl stop apparmor.service
+systemctl disable apparmor.service
 
+# https://www.server-world.info/en/note?os=Ubuntu_24.04&p=apparmor&f=1
+perl -pi -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="apparmor=0"/' /etc/default/grub
+update-grub
 
 ########################################
 ########################################
@@ -193,6 +197,17 @@ apt-get install kubectl kubelet kubeadm kubernetes-cni -y
 # Start services
 systemctl enable kubelet
 systemctl start kubelet
+
+# Free up port 53
+
+# https://unix.stackexchange.com/questions/676942/free-up-port-53-on-ubuntu-so-custom-dns-server-can-use-it
+# https://www.linuxuprising.com/2020/07/ubuntu-how-to-free-up-port-53-used-by.html
+
+perl -pi -e 's/^#DNS=.*/DNS=8.8.8.8/' /etc/systemd/resolved.conf
+perl -pi -e 's/^#DNSStubListener=.*/DNSStubListener=no/' /etc/systemd/resolved.conf
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+
 
 ########################################
 ########################################
@@ -325,3 +340,6 @@ do
 done
 
 echo Done.
+
+reboot
+
