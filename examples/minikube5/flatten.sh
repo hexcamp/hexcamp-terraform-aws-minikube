@@ -1,4 +1,4 @@
 #! /bin/bash
 
-export KUBECONFIG=kubeconfig_ip:$HOME/.kube/config
+export KUBECONFIG=kubeconfig_dns:$HOME/.kube/config
 kubectl config view --flatten
