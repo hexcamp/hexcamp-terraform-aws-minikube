@@ -278,7 +278,7 @@ cgroupDriver: systemd
 EOF
 
 kubeadm reset --force
-kubeadm init --config /tmp/kubeadm.yaml
+kubeadm init --config /tmp/kubeadm.yaml --ignore-preflight-errors=NumCPU
 
 # Use the local kubectl config for further kubectl operations
 export KUBECONFIG=/etc/kubernetes/admin.conf
