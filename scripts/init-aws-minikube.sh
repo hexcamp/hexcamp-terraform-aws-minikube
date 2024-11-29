@@ -243,6 +243,8 @@ nodeRegistration:
 localAPIEndpoint:
   advertiseAddress: $LOCAL_IP_ADDRESS
   bindPort: 6443
+patches:
+  directory: /kubeadm-patches
 ---
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
@@ -275,6 +277,38 @@ kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 cgroupDriver: systemd
 ---
+EOF
+
+# https://serverfault.com/questions/1089688/setting-resource-limits-on-kube-apiserver
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/#patches
+mkdir -p /kubeadm-patches
+cat >/kubeadm-patches/etcd.yaml <<EOF
+spec:
+  containers:
+  - name: etcd
+    resources:
+      \$patch: delete
+EOF
+cat >/kubeadm-patches/kube-apiserver.yaml <<EOF
+spec:
+  containers:
+  - name: kube-apiserver
+    resources:
+      \$patch: delete
+EOF
+cat >/kubeadm-patches/kube-controller-manager.yaml <<EOF
+spec:
+  containers:
+  - name: kube-controller-manager
+    resources:
+      \$patch: delete
+EOF
+cat >/kubeadm-patches/kube-scheduler.yaml <<EOF
+spec:
+  containers:
+  - name: kube-scheduler
+    resources:
+      \$patch: delete
 EOF
 
 kubeadm reset --force
