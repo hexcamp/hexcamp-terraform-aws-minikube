@@ -7,24 +7,24 @@ module "minikube" {
   source = "./../.."
 
   aws_region          = "us-west-2"
-  cluster_name        = "minikube4"
-  aws_instance_type   = "t3a.medium"
+  cluster_name        = "minikube8"
+  aws_instance_type   = "m7a.medium"
   ssh_public_key      = "~/.ssh/id_rsa.pub"
   aws_subnet_id       = "subnet-0a02e435e762c1bec"
   hosted_zone         = "localnet.farm"
   hosted_zone_private = false
-  ami_image_id        = "ami-08c191625cfb7ee61"
+  ami_image_id        = "ami-037b959c4c087f338"
 
   tags = {
     Application = "Minikube"
   }
   
   addons = [
-    "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/storage-class.yaml",
-    "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/csi-driver.yaml",
+    # "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/storage-class.yaml",
+    # "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/csi-driver.yaml",
     "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/metrics-server.yaml",
-    "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/dashboard.yaml",
-    "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/external-dns.yaml",
+    # "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/dashboard.yaml",
+    # "https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/addons/external-dns.yaml",
   ]
 }
 
