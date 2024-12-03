@@ -255,3 +255,14 @@ resource "aws_route53_record" "minikube" {
   allow_overwrite = true
 }
 
+resource "aws_route53_record" "minikube_wildcard" {
+  zone_id = data.aws_route53_zone.dns_zone.zone_id
+  name = "*.${var.cluster_name}.${var.hosted_zone}"
+  type = "A"
+  #records = [aws_eip.minikube.public_ip]
+  records = [aws_instance.minikube.public_ip]
+  ttl = 300
+  allow_overwrite = true
+}
+
+
