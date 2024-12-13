@@ -28,3 +28,8 @@ module "minikube" {
   ]
 }
 
+output "public_ip" {
+  description = "Public IP address"
+  value       = module.minikube.public_ip
+}
+
