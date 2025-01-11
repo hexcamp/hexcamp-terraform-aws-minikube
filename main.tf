@@ -150,26 +150,6 @@ resource "aws_key_pair" "minikube_keypair" {
 # EC2 instance
 #####
 
-data "aws_ami" "amazonlinux" {
-  most_recent = true
-  owners = ["amazon"]
-
-  filter {
-    name = "name"
-    values = ["al2023-ami-2023.6.20241010.0-kernel-6.1-x86_64"]
-  }
-
-  filter {
-    name = "architecture"
-    values = ["x86_64"]
-  }
-
-  filter {
-    name = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 #resource "aws_eip" "minikube" {
 #  #vpc = true
 #  domain = "vpc"
@@ -179,7 +159,7 @@ resource "aws_instance" "minikube" {
   # Instance type - any of the c4 should do for now
   instance_type = var.aws_instance_type
 
-  ami = length(var.ami_image_id) > 0 ? var.ami_image_id : data.aws_ami.amazonlinux.id
+  ami = var.ami_image_id
 
   key_name = aws_key_pair.minikube_keypair.key_name
 
