@@ -10,6 +10,11 @@ export AWS_SECRET_ACCESS_KEY=$LOCALNET_FARM_SECRET_ACCESS_KEY
 
 IP=$(tofu output -raw public_ip)
 
+if [ -z "$IP" ]; then
+  echo "No IP available."
+  exit
+fi
+
 
 # Update
 
