@@ -16,6 +16,14 @@ IP=$(tofu output -raw public_ip)
 export AWS_ACCESS_KEY_ID=$JIMPICK_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$JIMPICK_SECRET_ACCESS_KEY
 
+AWS_IP=$(aws route53 list-resource-record-sets --hosted-zone-id $HOSTED_ZONE_ID | \
+        jq -r '.ResourceRecordSets[] | select(.Name == "ns1.test.hex.camp.").ResourceRecords[0].Value')
+
+if [ "$IP" = "$AWS_IP" ]; then
+  echo No updated needed.
+  exit
+fi
+
 JSON="$(cat <<EOF
     {
       "Changes": [
