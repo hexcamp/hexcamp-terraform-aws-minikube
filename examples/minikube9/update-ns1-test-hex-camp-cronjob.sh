@@ -37,7 +37,7 @@ JSON="$(cat <<EOF
           "ResourceRecordSet": {
             "Name": "ns1.test.hex.camp",
             "Type": "A",
-            "TTL": 30,
+            "TTL": 300,
             "ResourceRecords": [
               {
                 "Value": "$IP"
