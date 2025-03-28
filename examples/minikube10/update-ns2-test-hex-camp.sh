@@ -51,3 +51,32 @@ aws route53 change-resource-record-sets \
   --hosted-zone-id $HOSTED_ZONE_ID \
   --change-batch "$JSON" | cat
 
+# Update ns-minikube10
+
+JSON="$(cat <<EOF
+    {
+      "Changes": [
+        {
+          "Action": "UPSERT",
+          "ResourceRecordSet": {
+            "Name": "ns-minikube10.test.hex.camp",
+            "Type": "A",
+            "TTL": 300,
+            "ResourceRecords": [
+              {
+                "Value": "$IP"
+              }
+            ]
+          }
+        }
+      ]
+    }
+EOF
+)"
+
+echo $JSON
+
+aws route53 change-resource-record-sets \
+  --hosted-zone-id $HOSTED_ZONE_ID \
+  --change-batch "$JSON" | cat
+
