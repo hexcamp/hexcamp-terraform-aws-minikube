@@ -143,8 +143,10 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 
 
 # Install calico
-kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-operator.yaml
-kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-cr.yaml
+#kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/8013eb285965fc220057664cddb021f3933b7bfb/calico/calico-operator.yaml
+#kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/master/calico/calico-cr.yaml
+kubectl create -f https://raw.githubusercontent.com/scholzj/terraform-aws-minikube/8013eb285965fc220057664cddb021f3933b7bfb/calico/calico-cr.yaml
 
 # Instal AWS Cloud Provider
 kubectl create -f https://raw.githubusercontent.com/hexcamp/hexcamp-terraform-aws-minikube/refs/heads/ubuntu/aws-cloud-provider/aws-cloud-provider.yaml
