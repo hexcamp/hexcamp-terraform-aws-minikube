@@ -204,14 +204,26 @@ resource "aws_instance" "minikube" {
     ]
   }
 
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price = 0.045
-      instance_interruption_behavior = "stop"
-      spot_instance_type = "persistent"
+  dynamic "instance_market_options" {
+    for_each = var.no_spot ? [] : [true]
+    content {
+      market_type = "spot"
+      spot_options {
+        max_price = 0.045
+        instance_interruption_behavior = "stop"
+        spot_instance_type = "persistent"
+      }
     }
   }
+
+  #instance_market_options {
+  #  market_type = "spot"
+  #  spot_options {
+  #    max_price = 0.045
+  #    instance_interruption_behavior = "stop"
+  #    spot_instance_type = "persistent"
+  #  }
+  #}
 
   credit_specification {
     cpu_credits = "standard"

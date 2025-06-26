@@ -23,6 +23,8 @@ module "minikube" {
   # ami_image_id        = "ami-01a9ae6aa888347fe" # amd64
   ami_image_id        = "ami-0eed33059dcc6fdf8"
 
+  no_spot             = true
+
   tags = {
     Application = "Minikube"
   }
