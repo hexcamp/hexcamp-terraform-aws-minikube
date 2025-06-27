@@ -8,7 +8,19 @@ module "minikube" {
 
   aws_region          = "eu-central-1"
   cluster_name        = "minikube9"
-  aws_instance_type   = "m7a.medium"
+ 
+  # https://instances.vantage.sh/aws/ec2/m5a.large?region=eu-central-1
+  # AMD, $0.086 on-demand, $0.0344 spot 
+  aws_instance_type   = "m5a.large"
+
+  # https://instances.vantage.sh/aws/ec2/m6a.large?region=eu-central-1
+  # AMD, $0.1035 on-demand, $0.0528 spot
+  #aws_instance_type   = "m6a.large"
+
+  # https://instances.vantage.sh/aws/ec2/m7a.medium?region=eu-central-1
+  # AMD, $0.0694 on-demand, $0.0243 spot
+  #aws_instance_type   = "m7a.medium"
+
   ssh_public_key      = "~/.ssh/id_rsa.pub"
   aws_subnet_id       = "subnet-0dff924c15b061ac5"
   hosted_zone         = "localnet.farm"
