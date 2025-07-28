@@ -29,13 +29,15 @@ if [ "$IP" = "$AWS_IP" ]; then
   exit
 fi
 
-JSON="$(cat <<EOF
+update () {
+  NAME="$1"
+  JSON="$(cat <<EOF
     {
       "Changes": [
         {
           "Action": "UPSERT",
           "ResourceRecordSet": {
-            "Name": "ns3.test.hex.camp",
+            "Name": "$NAME.hex.camp",
             "Type": "A",
             "TTL": 300,
             "ResourceRecords": [
@@ -50,38 +52,36 @@ JSON="$(cat <<EOF
 EOF
 )"
 
-echo $JSON
+  echo $JSON
 
-aws route53 change-resource-record-sets \
-  --hosted-zone-id $HOSTED_ZONE_ID \
-  --change-batch "$JSON" | cat
+  aws route53 change-resource-record-sets \
+    --hosted-zone-id $HOSTED_ZONE_ID \
+    --change-batch "$JSON" | cat
+}
+
+# Update ns1.test.hex.camp
+update ns1.test
 
 # Update ns-minikube11
+update ns-minikube11.test
 
-JSON="$(cat <<EOF
-    {
-      "Changes": [
-        {
-          "Action": "UPSERT",
-          "ResourceRecordSet": {
-            "Name": "ns-minikube11.test.hex.camp",
-            "Type": "A",
-            "TTL": 300,
-            "ResourceRecords": [
-              {
-                "Value": "$IP"
-              }
-            ]
-          }
-        }
-      ]
-    }
-EOF
-)"
+# Update ns-vichex-{1,2,3,4}.hex.camp
+update ns-vichex-1
+update ns-vichex-2
+update ns-vichex-3
+update ns-vichex-4
 
-echo $JSON
+# Update ns-vanhex-{1,2,3,4}.hex.camp
+update ns-vanhex-1
+update ns-vanhex-2
+update ns-vanhex-3
+update ns-vanhex-4
 
-aws route53 change-resource-record-sets \
-  --hosted-zone-id $HOSTED_ZONE_ID \
-  --change-batch "$JSON" | cat
+# Update ns-seahex-{1,2,3,4}.hex.camp
+update ns-seahex-1
+update ns-seahex-2
+update ns-seahex-3
+update ns-seahex-4
+
+
 
