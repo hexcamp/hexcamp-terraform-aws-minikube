@@ -83,5 +83,10 @@ update ns-seahex-2
 update ns-seahex-3
 update ns-seahex-4
 
+# Update ns-peerhex-{1,2,3,4}.hex.camp
+update ns-peerhex-1
+update ns-peerhex-2
+update ns-peerhex-3
+update ns-peerhex-4
 
 
