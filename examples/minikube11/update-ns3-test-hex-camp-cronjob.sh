@@ -83,5 +83,12 @@ update ns-seahex-2
 update ns-seahex-3
 update ns-seahex-4
 
+# Update ns-islandhex-{1,2,3,4}.hex.camp
+update ns-islandhex-1
+update ns-islandhex-2
+update ns-islandhex-3
+update ns-islandhex-4
+
+
 
 
