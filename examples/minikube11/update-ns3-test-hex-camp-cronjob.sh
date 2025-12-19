@@ -59,17 +59,17 @@ EOF
     --change-batch "$JSON" | cat
 }
 
-# Update ns1.test.hex.camp
-update ns1.test
+# Update ns3.test.hex.camp
+update ns3.test
 
 # Update ns-minikube11
 update ns-minikube11.test
 
 # Update ns-vichex-{1,2,3,4}.hex.camp
-update ns-vichex-1
-update ns-vichex-2
+#update ns-vichex-1
+#update ns-vichex-2
 update ns-vichex-3
-update ns-vichex-4
+#update ns-vichex-4
 
 # Update ns-vanhex-{1,2,3,4}.hex.camp
 update ns-vanhex-1
