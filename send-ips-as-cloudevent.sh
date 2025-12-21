@@ -17,9 +17,9 @@ MINIKUBE11=$(cd examples/minikube11; tofu output -raw public_ip)
 echo minikube11: $MINIKUBE11
 
 jq -n " \
-  .minikube10_ip=\"$MINIKUBE10\" | \
-  .minikube11_ip=\"$MINIKUBE11\" | \
-  .minikube9_ip=\"$MINIKUBE9\"" > /tmp/ips.json
+  .minikube10=\"$MINIKUBE10\" | \
+  .minikube11=\"$MINIKUBE11\" | \
+  .minikube9=\"$MINIKUBE9\"" > /tmp/ips.json
 
 # https://stackoverflow.com/questions/7642743/how-to-generate-random-numbers-in-the-busybox-shell
 ID=$(</dev/urandom tr -dc A-Za-z0-9-_ | head -c 22 || true)
