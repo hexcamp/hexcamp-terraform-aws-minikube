@@ -73,25 +73,25 @@ update ns-vichex-2
 
 # Update ns-vanhex-{1,2,3,4}.hex.camp
 #update ns-vanhex-1
-#update ns-vanhex-2
+update ns-vanhex-2
 #update ns-vanhex-3
 #update ns-vanhex-4
 
 # Update ns-seahex-{1,2,3,4}.hex.camp
 #update ns-seahex-1
-#update ns-seahex-2
+update ns-seahex-2
 #update ns-seahex-3
 #update ns-seahex-4
 
 # Update ns-islandhex-{1,2,3,4}.hex.camp
 #update ns-islandhex-1
-#update ns-islandhex-2
+update ns-islandhex-2
 #update ns-islandhex-3
 #update ns-islandhex-4
 
 # Update ns-peerhex-{1,2,3,4}.hex.camp
 #update ns-peerhex-1
-#update ns-peerhex-2
+update ns-peerhex-2
 #update ns-peerhex-3
 #update ns-peerhex-4
 
